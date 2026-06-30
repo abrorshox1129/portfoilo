@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abrorjon Muhammadaliyev | Data Analyst</title>
+<style>
+  :root{
+    --bg:#070b14;
+    --bg-2:#0c1322;
+    --panel:#0e1626;
+    --line:#1c2740;
+    --cyan:#3ee8d8;
+    --amber:#ffb347;
+    --text:#dce6f5;
+    --text-dim:#7e8fae;
+    --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+    --sans:'Inter',-apple-system,sans-serif;
+  }
+  @font-face{font-family:'Inter';src:local('Inter');}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---------- animated data-grid background ---------- */
+  #bg-canvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    opacity:.55;
+  }
+  .grid-overlay{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:48px 48px;
+    opacity:.25;
+    mask-image:radial-gradient(ellipse at 50% 0%, black 0%, transparent 75%);
+    pointer-events:none;
+  }
+  .scanline{
+    position:fixed;
+    left:0; right:0;
+    height:120px;
+    background:linear-gradient(180deg, transparent, rgba(62,232,216,.05), transparent);
+    z-index:2;
+    pointer-events:none;
+    animation:scan 9s linear infinite;
+  }
+  @keyframes scan{
+    0%{top:-120px;}
+    100%{top:100vh;}
+  }
+
+  .wrap{position:relative;z-index:3;}
+  section{padding:120px 8vw;max-width:1180px;margin:0 auto;}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:22px 8vw;
+    backdrop-filter:blur(10px);
+    background:rgba(7,11,20,.65);
+    border-bottom:1px solid var(--line);
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  @media(max-width:760px){
+    .logo .role{display:none;}
+    .navlinks{gap:18px;}
+  }
+  .logo{
+    font-family:var(--mono);
+    font-size:15px;
+    color:var(--cyan);
+    letter-spacing:.5px;
+    font-weight:700;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+  }
+  .logo .role{color:var(--text-dim);font-weight:400;font-size:12px;letter-spacing:1px;text-transform:uppercase;}
+  .navlinks{display:flex;gap:34px;}
+  .navlinks a{
+    color:var(--text-dim);
+    text-decoration:none;
+    font-size:13px;
+    font-family:var(--mono);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    transition:color .25s;
+    position:relative;
+  }
+  .navlinks a::after{
+    content:'';position:absolute;left:0;bottom:-6px;width:0%;height:1px;background:var(--cyan);
+    transition:width .3s;
+  }
+  .navlinks a:hover{color:var(--cyan);}
+  .navlinks a:hover::after{width:100%;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-top:90px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    color:var(--cyan);
+    font-size:13px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    margin-bottom:22px;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .1s;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{
+    content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 12px var(--cyan);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+
+  h1{
+    font-size:clamp(40px,7vw,86px);
+    font-weight:800;
+    line-height:1.02;
+    letter-spacing:-2px;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .25s;
+  }
+  h1 .accent{
+    color:var(--cyan);
+    text-shadow:0 0 28px rgba(62,232,216,.35);
+  }
+  .hero-sub{
+    margin-top:26px;
+    font-size:clamp(16px,2vw,19px);
+    color:var(--text-dim);
+    max-width:620px;
+    line-height:1.7;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .4s;
+  }
+  .hero-sub b{color:var(--text);font-weight:600;}
+
+  .hero-cta{
+    margin-top:42px;
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .55s;
+  }
+  .btn{
+    font-family:var(--mono);
+    font-size:14px;
+    padding:14px 26px;
+    border-radius:4px;
+    text-decoration:none;
+    letter-spacing:.5px;
+    transition:transform .25s, box-shadow .25s, background .25s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-fill{
+    background:var(--cyan);
+    color:#06121a;
+    font-weight:700;
+  }
+  .btn-fill:hover{transform:translateY(-3px);box-shadow:0 12px 30px -8px rgba(62,232,216,.5);}
+  .btn-line{
+    border:1px solid var(--line);
+    color:var(--text);
+  }
+  .btn-line:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-3px);}
+
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(22px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* terminal card */
+  .term{
+    margin-top:70px;
+    max-width:560px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .7s;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.6);
+  }
+  .term-head{
+    display:flex;align-items:center;gap:8px;
+    padding:12px 16px;
+    background:#0a1120;
+    border-bottom:1px solid var(--line);
+  }
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot.r{background:#ff5f56;}.dot.y{background:#ffbd2e;}.dot.g{background:#27c93f;}
+  .term-title{margin-left:8px;font-family:var(--mono);font-size:12px;color:var(--text-dim);}
+  .term-body{padding:20px 22px;font-family:var(--mono);font-size:13.5px;line-height:1.9;}
+  .term-body .pr{color:var(--cyan);}
+  .term-body .cm{color:var(--text-dim);}
+  .typed{border-right:2px solid var(--cyan);white-space:nowrap;overflow:hidden;display:inline-block;}
+
+  /* ---------- section heads ---------- */
+  .sec-head{margin-bottom:60px;}
+  .sec-tag{
+    font-family:var(--mono);color:var(--cyan);font-size:13px;letter-spacing:3px;text-transform:uppercase;
+  }
+  .sec-title{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-1px;margin-top:12px;}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.show{opacity:1;transform:translateY(0);}
+
+  /* ---------- about ---------- */
+  .about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;}
+  @media(max-width:860px){.about-grid{grid-template-columns:1fr;}}
+  .about-text p{color:var(--text-dim);line-height:1.85;font-size:16px;margin-bottom:18px;}
+  .about-text b{color:var(--text);}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px;}
+  .stat-box{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:8px;
+    padding:22px;
+    transition:border-color .3s, transform .3s;
+  }
+  .stat-box:hover{border-color:var(--cyan);transform:translateY(-4px);}
+  .stat-num{font-family:var(--mono);font-size:32px;font-weight:700;color:var(--cyan);}
+  .stat-label{font-size:12.5px;color:var(--text-dim);margin-top:6px;letter-spacing:.3px;}
+
+  /* ---------- skills ---------- */
+  .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
+  .skill-card{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:10px;
+    padding:26px;
+    position:relative;
+    overflow:hidden;
+    transition:transform .35s ease, border-color .35s ease;
+  }
+  .skill-card::before{
+    content:'';position:absolute;top:0;left:0;width:100%;height:2px;
+    background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+    transform:translateX(-100%);
+    transition:transform .6s ease;
+  }
+  .skill-card:hover::before{transform:translateX(0);}
+  .skill-card:hover{transform:translateY(-6px);border-color:#27375a;}
+  .skill-icon{font-family:var(--mono);color:var(--cyan);font-size:13px;letter-spacing:1px;}
+  .skill-name{font-size:18px;font-weight:700;margin-top:14px;}
+  .skill-desc{color:var(--text-dim);font-size:13.5px;margin-top:8px;line-height:1.6;}
+  .bar{height:4px;background:#16223b;border-radius:2px;margin-top:18px;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),#7ad9ff);width:0%;border-radius:2px;transition:width 1.2s ease;}
+
+  /* ---------- projects ---------- */
+  .proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;}
+  .proj-card{
+    border:1px solid var(--line);
+    background:linear-gradient(160deg,var(--panel),#0a1120);
+    border-radius:12px;
+    padding:28px;
+    display:flex;flex-direction:column;
+    transition:transform .35s ease, border-color .35s, box-shadow .35s;
+    position:relative;
+  }
+  .proj-card:hover{
+    transform:translateY(-8px);
+    border-color:var(--cyan);
+    box-shadow:0 25px 50px -20px rgba(62,232,216,.18);
+  }
+  .proj-num{font-family:var(--mono);color:var(--text-dim);font-size:12px;}
+  .proj-title{font-size:20px;font-weight:700;margin-top:14px;margin-bottom:10px;}
+  .proj-desc{color:var(--text-dim);font-size:14px;line-height:1.7;flex-grow:1;}
+  .proj-tags{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0;}
+  .tag{
+    font-family:var(--mono);font-size:11px;color:var(--cyan);
+    border:1px solid #1f3a3a;background:rgba(62,232,216,.06);
+    padding:4px 10px;border-radius:20px;
+  }
+  .proj-link{
+    font-family:var(--mono);font-size:13px;color:var(--text);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+    border-top:1px solid var(--line);padding-top:16px;margin-top:auto;
+    transition:color .25s, gap .25s;
+  }
+  .proj-link:hover{color:var(--cyan);gap:10px;}
+
+  /* ---------- process ---------- */
+  .flow{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;}
+  .flow-step{
+    flex:1;min-width:200px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:26px 22px;
+    position:relative;
+  }
+  .flow-step:not(:last-child)::after{
+    content:'→';
+    position:absolute;right:-14px;top:50%;transform:translateY(-50%);
+    color:var(--cyan);font-family:var(--mono);font-size:18px;z-index:2;
+    background:var(--bg);width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  }
+  @media(max-width:760px){.flow-step:not(:last-child)::after{display:none;}}
+  .flow-num{font-family:var(--mono);color:var(--cyan);font-size:13px;}
+  .flow-title{font-weight:700;margin-top:10px;font-size:15.5px;}
+  .flow-desc{color:var(--text-dim);font-size:13px;margin-top:8px;line-height:1.6;}
+
+  /* ---------- contact ---------- */
+  .contact-panel{
+    border:1px solid var(--line);
+    background:radial-gradient(circle at 20% 20%, rgba(62,232,216,.08), transparent 60%), var(--panel);
+    border-radius:16px;
+    padding:60px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .contact-panel h2{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-1px;}
+  .contact-panel p{color:var(--text-dim);margin-top:14px;max-width:480px;margin-left:auto;margin-right:auto;}
+  .contact-links{display:flex;justify-content:center;gap:16px;margin-top:36px;flex-wrap:wrap;}
+
+  footer{
+    text-align:center;
+    padding:34px 8vw 50px;
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:12px;
+    border-top:1px solid var(--line);
+  }
+
+  ::selection{background:var(--cyan);color:#06121a;}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="grid-overlay"></div>
+<div class="scanline"></div>
+
+<nav>
+  <div class="logo">Abrorjon Muhammadaliyev<span class="role">/ data analyst</span></div>
+  <div class="navlinks">
+    <a href="#about">about</a>
+    <a href="#skills">skills</a>
+    <a href="#projects">projects</a>
+    <a href="#process">process</a>
+    <a href="#contact">contact</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">data analyst &mdash; fergana, uzbekistan</div>
+    <h1>Abrorjon<br>Muhammad<span class="accent">aliyev</span></h1>
+    <p class="hero-sub">
+      Xom ma'lumotlarni <b>aniq, harakatga undovchi insight</b>larga aylantiraman.
+      SQL, Python va Power BI yordamida biznes qarorlarini raqamlar bilan qo'llab-quvvatlayman —
+      kredit va moliya sohasidan tortib, savdo va operatsion tahlilgacha.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-fill" href="#projects">Loyihalarni ko'rish ↓</a>
+      <a class="btn btn-line" href="#contact">Bog'lanish</a>
+    </div>
+
+    <div class="term">
+      <div class="term-head">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="term-title">analyst@fergana:~</div>
+      </div>
+      <div class="term-body">
+        <div><span class="pr">$</span> <span id="typed-line" class="typed"></span></div>
+        <div class="cm" id="typed-out" style="margin-top:6px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="sec-head reveal">
+      <div class="sec-tag">// 01 — about</div>
+      <div class="sec-title">Raqamlar ortidagi tendentsiyani ko'raman</div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>Men <b>Fergana Davlat Texnika Universiteti</b>da Bank ishi va Moliya yo'nalishida tahsil olaman, shu bilan birga
+        <b>Najot Ta'lim</b>da intensiv Data Analytics sertifikat dasturini yakunlamoqdaman.</p>
+        <p>Asosiy yo'nalishim — <b>SQL, Python va Power BI / DAX</b> yordamida biznes muammolarini diagnostika qilish:
+        savdo pasayishi sabablarini topish, ma'lumotlar sifati anomaliyalarini aniqlash va interaktiv dashboardlar orqali
+        qarorlar qabul qilishni tezlashtirish.</p>
+        <p>Hozirda O'zbekiston bozoriga moslangan kredit/lending tahlillari ustida ishlayman va mahalliy bizneslarga
+        freelance konsalting xizmatini rivojlantirmoqdaman.</p>
+      </div>
+      <div class="stat-grid reveal">
+        <div class="stat-box"><div class="stat-num" data-count="21">0</div><div class="stat-label">GitHub repositories</div></div>
+        <div class="stat-box"><div class="stat-num" data-count="3">0</div><div class="stat-label">Asosiy texnologiya: SQL · Python · Power BI</div></div>
+        <div class="stat-box"><div class="stat-num" data-count="100">0</div><div class="stat-label">% — freelance konsalting yo'nalishi</div></div>
+        <div class="stat-box"><div class="stat-num" data-count="2026">0</div><div class="stat-label">Data Analyst sifatida ishlashni boshlash maqsadi</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="sec-head reveal">
+      <div class="sec-tag">// 02 — tech stack</div>
+      <div class="sec-title">Ishlatadigan vositalarim</div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <div class="skill-icon">[ DB ]</div>
+        <div class="skill-name">SQL</div>
+        <div class="skill-desc">Murakkab so'rovlar, oyna funksiyalari, ma'lumotlarni tozalash va modellashtirish.</div>
+        <div class="bar"><div class="bar-fill" data-w="92"></div></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">[ PY ]</div>
+        <div class="skill-name">Python</div>
+        <div class="skill-desc">Pandas, NumPy bilan EDA, avtomatlashtirish va API integratsiyalari.</div>
+        <div class="bar"><div class="bar-fill" data-w="88"></div></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">[ BI ]</div>
+        <div class="skill-name">Power BI &amp; DAX</div>
+        <div class="skill-desc">KPI kartalar, dinamik o'lchovlar, drillthrough va field parametrlar.</div>
+        <div class="bar"><div class="bar-fill" data-w="95"></div></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">[ XL ]</div>
+        <div class="skill-name">Excel</div>
+        <div class="skill-desc">Pivot jadvallar, moliyaviy modellashtirish va hisobot avtomatlashtirish.</div>
+        <div class="bar"><div class="bar-fill" data-w="85"></div></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">[ VZ ]</div>
+        <div class="skill-name">Data Storytelling</div>
+        <div class="skill-desc">Murakkab ma'lumotlarni qaror qabul qiluvchilar uchun aniq vizual hikoyaga aylantirish.</div>
+        <div class="bar"><div class="bar-fill" data-w="90"></div></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">[ FIN ]</div>
+        <div class="skill-name">Credit &amp; Risk Analytics</div>
+        <div class="skill-desc">Kredit risklarini baholash, lending ma'lumotlar tuzilmasi, moliyaviy kontekst.</div>
+        <div class="bar"><div class="bar-fill" data-w="80"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-head reveal">
+      <div class="sec-tag">// 03 — featured work</div>
+      <div class="sec-title">Tanlangan loyihalar</div>
+    </div>
+    <div class="proj-grid">
+
+      <div class="proj-card reveal">
+        <div class="proj-num">01</div>
+        <div class="proj-title">Airline Flights Analysis</div>
+        <div class="proj-desc">Aviakompaniya parvozlari bo'yicha keng qamrovli Power BI dashboard — kechikishlar, marshrutlar va narxlash tendentsiyalarini tahlil qilish.</div>
+        <div class="proj-tags"><span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">.pbix</span></div>
+        <a class="proj-link" href="https://github.com/abrorshox1129/airline-flights-data-analysis-powerbi.pbix" target="_blank">GitHub'da ko'rish →</a>
+      </div>
+
+      <div class="proj-card reveal">
+        <div class="proj-num">02</div>
+        <div class="proj-title">E-commerce Sales Dashboard</div>
+        <div class="proj-desc">Onlayn-do'kon savdo ma'lumotlari asosida interaktiv dashboard: daromad, buyurtmalar, mijozlar segmentatsiyasi.</div>
+        <div class="proj-tags"><span class="tag">Power BI</span><span class="tag">SQL</span><span class="tag">DAX</span></div>
+        <a class="proj-link" href="https://github.com/abrorshox1129/ecommerce-sales-analysis-powerbi-dashboard" target="_blank">GitHub'da ko'rish →</a>
+      </div>
+
+      <div class="proj-card reveal">
+        <div class="proj-num">03</div>
+        <div class="proj-title">Netflix Content Analysis</div>
+        <div class="proj-desc">Netflix kontent katalogini tahlil qilib, janr, davlat va chiqarilish yili bo'yicha tendentsiyalarni vizualizatsiya qilish.</div>
+        <div class="proj-tags"><span class="tag">Power BI</span><span class="tag">Data Cleaning</span></div>
+        <a class="proj-link" href="https://github.com/abrorshox1129/netflix-content-analysis-powerbi-dashboard" target="_blank">GitHub'da ko'rish →</a>
+      </div>
+
+      <div class="proj-card reveal">
+        <div class="proj-num">04</div>
+        <div class="proj-title">SQL + Power BI Pipeline</div>
+        <div class="proj-desc">SQL orqali ma'lumotlarni tayyorlash va Power BI'ga ulash bo'yicha end-to-end ish jarayoni namunasi.</div>
+        <div class="proj-tags"><span class="tag">SQL</span><span class="tag">ETL</span><span class="tag">Power BI</span></div>
+        <a class="proj-link" href="https://github.com/abrorshox1129/SQL-WITH-POWERBI" target="_blank">GitHub'da ko'rish →</a>
+      </div>
+
+      <div class="proj-card reveal">
+        <div class="proj-num">05</div>
+        <div class="proj-title">Students Performance Dashboard</div>
+        <div class="proj-desc">O'quvchilar akademik natijalarini fanlar, sinflar va davrlar kesimida kuzatish uchun BI dashboard.</div>
+        <div class="proj-tags"><span class="tag">Power BI</span><span class="tag">Education Data</span></div>
+        <a class="proj-link" href="https://github.com/abrorshox1129/Students-Performances-Dashboard-with-PowerBI" target="_blank">GitHub'da ko'rish →</a>
+      </div>
+
+      <div class="proj-card reveal">
+        <div class="proj-num">06</div>
+        <div class="proj-title">Restaurant Industry Analysis</div>
+        <div class="proj-desc">Python va Jupyter Notebook yordamida restoran sanoati ma'lumotlarini chuqur tahlil qilish.</div>
+        <div class="proj-tags"><span class="tag">Python</span><span class="tag">Jupyter</span><span class="tag">EDA</span></div>
+        <a class="proj-link" href="https://github.com/abrorshox1129/Restaurant-Industry-Analysis" target="_blank">GitHub'da ko'rish →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="sec-head reveal">
+      <div class="sec-tag">// 04 — workflow</div>
+      <div class="sec-title">Ishlash jarayonim</div>
+    </div>
+    <div class="flow reveal">
+      <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Savol qo'yish</div><div class="flow-desc">Biznes muammosini aniq diagnostik savollar orqali tushunish.</div></div>
+      <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Ma'lumot yig'ish</div><div class="flow-desc">SQL/Python orqali manbalardan toza, ishonchli dataset tayyorlash.</div></div>
+      <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Tahlil</div><div class="flow-desc">Tendentsiya, anomaliya va sabab-oqibat bog'liqliklarini aniqlash.</div></div>
+      <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Vizualizatsiya</div><div class="flow-desc">Power BI dashboard orqali insightlarni tushunarli qilib taqdim etish.</div></div>
+      <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">Qaror</div><div class="flow-desc">Mijoz/jamoa uchun amaliy tavsiyalar bilan yakunlash.</div></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-panel reveal">
+      <h2>Birgalikda ishlaylikmi?</h2>
+      <p>Ma'lumotlaringizni insightga aylantirish, dashboard qurish yoki tahlil bo'yicha konsalting kerakmi — yozing.</p>
+      <div class="contact-links">
+        <a class="btn btn-fill" href="mailto:abrorjon0514l@gmail.com">Email yozish</a>
+        <a class="btn btn-line" href="https://t.me/Abrorjon_Muhammadaliyev" target="_blank">Telegram</a>
+        <a class="btn btn-line" href="tel:+998933933203">+998 93 393 32 03</a>
+        <a class="btn btn-line" href="https://www.linkedin.com/in/abrorjon-muhammadaliyev-920074333/" target="_blank">LinkedIn</a>
+        <a class="btn btn-line" href="https://github.com/abrorshox1129" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>© 2026 Abrorjon Muhammadaliyev — Fergana, Uzbekistan. Built with data in mind.</footer>
+
+</div>
+
+<script>
+// ---------- animated network background ----------
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let w, h, nodes;
+
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); initNodes(); });
+
+function initNodes(){
+  const count = Math.max(40, Math.floor((w*h)/28000));
+  nodes = Array.from({length:count}, () => ({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    vx: (Math.random()-0.5)*0.25,
+    vy: (Math.random()-0.5)*0.25,
+    r: Math.random()*1.6+0.6
+  }));
+}
+initNodes();
+
+function step(){
+  ctx.clearRect(0,0,w,h);
+  for(const n of nodes){
+    n.x += n.vx; n.y += n.vy;
+    if(n.x < 0 || n.x > w) n.vx *= -1;
+    if(n.y < 0 || n.y > h) n.vy *= -1;
+  }
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a = nodes[i], b = nodes[j];
+      const dx = a.x-b.x, dy = a.y-b.y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < 140){
+        ctx.strokeStyle = `rgba(62,232,216,${(1 - dist/140)*0.18})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(a.x,a.y);
+        ctx.lineTo(b.x,b.y);
+        ctx.stroke();
+      }
+    }
+  }
+  for(const n of nodes){
+    ctx.beginPath();
+    ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(62,232,216,0.55)';
+    ctx.fill();
+  }
+  requestAnimationFrame(step);
+}
+step();
+
+// ---------- typed terminal text ----------
+const cmds = [
+  { line: "python analyze_credit_risk.py", out: ">> insight aniqlandi: default rate 90 kunda 4.2% ga oshdi" },
+  { line: "SELECT region, SUM(revenue) FROM sales GROUP BY region;", out: ">> Farg'ona viloyati eng yuqori o'sish ko'rsatdi: +18%" },
+  { line: "powerbi --refresh dashboard.pbix", out: ">> dashboard yangilandi ✓ 24 ta KPI faol" }
+];
+let ci = 0;
+function typeLine(){
+  const el = document.getElementById('typed-line');
+  const out = document.getElementById('typed-out');
+  const cmd = cmds[ci % cmds.length];
+  let i = 0;
+  el.textContent = '';
+  out.textContent = '';
+  el.style.borderRight = '2px solid var(--cyan)';
+  const typer = setInterval(() => {
+    el.textContent = cmd.line.slice(0, i+1);
+    i++;
+    if(i >= cmd.line.length){
+      clearInterval(typer);
+      setTimeout(() => {
+        out.textContent = cmd.out;
+        setTimeout(() => { ci++; typeLine(); }, 2200);
+      }, 300);
+    }
+  }, 38);
+}
+typeLine();
+
+// ---------- scroll reveal ----------
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('show');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ---------- count up stats ----------
+const counters = document.querySelectorAll('.stat-num');
+const cObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const el = entry.target;
+      const target = parseInt(el.dataset.count, 10);
+      let cur = 0;
+      const step = Math.max(1, Math.ceil(target/40));
+      const t = setInterval(() => {
+        cur += step;
+        if(cur >= target){ cur = target; clearInterval(t); }
+        el.textContent = cur;
+      }, 30);
+      cObs.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+counters.forEach(c => cObs.observe(c));
+
+// ---------- skill bars ----------
+const bars = document.querySelectorAll('.bar-fill');
+const bObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.style.width = entry.target.dataset.w + '%';
+      bObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+bars.forEach(b => bObs.observe(b));
+</script>
+
+</body>
+</html>
